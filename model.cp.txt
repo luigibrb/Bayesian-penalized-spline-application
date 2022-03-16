@@ -1,0 +1,45 @@
+model{
+
+#Likelihood of the model
+
+  for (i in 1:n){
+    response[i]~dnorm(m[i],taueps)
+
+    m[i]<-mfe[i]+mre110[i]+mre1120[i]
+
+    mfe[i]<-beta[1]*X[i,1]+beta[2]*X[i,2]
+
+    mre110[i]<-	b[1]*Z[i,1]+b[2]*Z[i,2]+b[3]*Z[i,3]+b[4]*Z[i,4]+
+    		b[5]*Z[i,5]+b[6]*Z[i,6]+b[7]*Z[i,7]+b[8]*Z[i,8]+
+    		b[9]*Z[i,9]+b[10]*Z[i,10]
+
+    mre1120[i]<-b[11]*Z[i,11]+b[12]*Z[i,12]+b[13]*Z[i,13]+b[14]*Z[i,14]+
+    		b[15]*Z[i,15]+b[16]*Z[i,16]+b[17]*Z[i,17]+b[18]*Z[i,18]+
+    		b[19]*Z[i,19]+b[20]*Z[i,20]}
+  
+#Prior distributions of the random effects parameters
+
+  for (k in 1:num.knots){
+    b[k]~dnorm(0,taub)}
+  
+#Prior distribution of the fixed effects parameters
+
+  for (l in 1:2){
+    beta[l]~dnorm(0,1.0E-6)}
+  
+#Prior distributions of the precision parameters
+
+  taueps~dgamma(1.0E-6,1.0E-6)
+  taub~dgamma(1.0E-6,1.0E-6)
+
+#Deterministic transformations
+
+  sigmaeps<-1/sqrt(taueps)
+  sigmab<-1/sqrt(taub)
+  lambda<-pow(sigmab,2)/pow(sigmaeps,2)
+
+#Predicting new observations
+  for (i in 1:n)
+    {epsilonstar[i]~dnorm(0,taueps)
+    ystar[i]<-m[i]+epsilonstar[i]}
+  }
